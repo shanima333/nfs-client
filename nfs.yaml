@@ -1,0 +1,23 @@
+---
+  - name: "Configure NFS client"
+    hosts: all
+    become: true
+    vars:
+      nfs_server_1: 172.31.26.249:/EM/FTP/sys_master/
+      nsf_client_1: /EM/hybris/data/sys_master
+      nfs_server_2: 172.31.26.249:/EM/FTP/to_Hybris/AS400_OUT
+      nfs_client_2: /EM/hybris/data/FTP/to_hybris/AS400_OUT
+    tasks:
+
+
+      - name: install nfs client
+        yum: name=nfs-utils state=present
+
+      - name: Ensure rpcbind is running
+        service: name=rpcbind state=started enabled=yes
+
+      - name: Mounting NFS share
+        mount: name={{ nsf_client_1 }} src={{ nfs_server_1 }} fstype=nfs opts=lookupcache=none,nosuid,hard,intr state=present
+      - name: Create mount point /EM/hybris/data/sys_master
+        file: path={{ nsf_client_1 }} state=directory
+
